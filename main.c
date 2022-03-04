@@ -3,6 +3,20 @@
 #include "app_util_platform.h"
 #include "app_error.h"
 #include "nrf_drv_twi.h"
+#include "nrf_delay.h"
+
+//BME68 libraries
+#include "bme68x.h"
+#include "bme68x_defs.h"
+
+//SENSIRION's sensor libraries
+#include "sensirion_common.h"
+#include "sensirion_config.h"   //forse manca una libreria qua sensirion_i2c_hal
+#include "sensirion_i2c.h"
+#include "scd4x_i2c.h"
+#include "sps30.h"
+
+//ULPMS libraries   ancora da fare per nRF
 
 /* TWI instance ID. */
 #if TWI0_ENABLED
@@ -49,10 +63,8 @@ int main(void)
     uint8_t address;
     uint8_t sample_data;
     bool detected_device = false;
-    printf("Start\n\r");
 
     twi_init();
-    printf("Start3\n\r");
 
     for (address = 1; address <= TWI_ADDRESSES; address++)
     {
@@ -73,10 +85,45 @@ int main(void)
         //NRF_LOG_FLUSH();
         printf("nodetect\n\r");
     }
+    
+    struct sps30_measurement measurement;
+    int16_t ret;
+    int16_t dato;
+    
+    //check if the sensor is ready to start and initialize it
 
+
+    while (sps30_probe() != 0) 
+    {
+        printf("probe failed\n\r");
+        nrf_delay_ms(1000);
+    }
+
+    //start measurement and wait for 10s to ensure the sensor has a
+    //stable flow and possible remaining particles are cleaned out
+    if (sps30_start_measurement() != 0) 
+    {
+        printf("error starting measurement\n\r");
+    }
+    nrf_delay_ms(10000);
+
+    for(int i=0; i < 20; i++)
+    {
+        nrf_delay_ms(2000);
+        if(ret < 0)
+        {
+            printf("read measurement failed\n\r");
+        }
+        else
+        {
+            dato = measurement.mc_2p5; //da sistemare questo passaggio, il float non me lo stampa, int si
+            printf("PM 2.5: %d\n\r", dato);
+        }
+    }
+
+    //sps30_stop_measurement();
     while (true)
     {
-        /* Empty loop. */
     }
 }
 
