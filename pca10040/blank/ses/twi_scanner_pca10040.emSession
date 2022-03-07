@@ -25,6 +25,12 @@
   <ProjectSessionItem path="twi_scanner_pca10040;twi_scanner_pca10040"/>
   <ProjectSessionItem path="twi_scanner_pca10040;twi_scanner_pca10040;Application"/>
   <ProjectSessionItem path="twi_scanner_pca10040;twi_scanner_pca10040;BME"/>
+  <ProjectSessionItem path="twi_scanner_pca10040;twi_scanner_pca10040;Board Definition"/>
+  <ProjectSessionItem path="twi_scanner_pca10040;twi_scanner_pca10040;None"/>
+  <ProjectSessionItem path="twi_scanner_pca10040;twi_scanner_pca10040;nRF_Drivers"/>
+  <ProjectSessionItem path="twi_scanner_pca10040;twi_scanner_pca10040;nRF_Libraries"/>
+  <ProjectSessionItem path="twi_scanner_pca10040;twi_scanner_pca10040;nRF_Log"/>
+  <ProjectSessionItem path="twi_scanner_pca10040;twi_scanner_pca10040;nRF_Segger_RTT"/>
   <ProjectSessionItem path="twi_scanner_pca10040;twi_scanner_pca10040;Segger Startup Files"/>
   <ProjectSessionItem path="twi_scanner_pca10040;twi_scanner_pca10040;SENSIRION"/>
  </Project>
@@ -59,11 +65,7 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="105" y="118" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../main.c" selected="1" top="105" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="8" y="142" useTextEdit="1" openedFrom="C:/nrf_sdk/nRF5_SDK_17.1.0_ddde560/examples/My Projects/Progetto_tesi/main.c" useBinaryEdit="0" left="0" path="../../../SENSIRION/sps30.h" selected="0" top="127" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="24" y="66" useTextEdit="1" openedFrom="C:/nrf_sdk/nRF5_SDK_17.1.0_ddde560/examples/My Projects/Progetto_tesi/main.c" useBinaryEdit="0" left="0" path="../../../SENSIRION/sps30.c" selected="0" top="49" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="61" y="51" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../SENSIRION/sensirion_common.c" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="17" y="160" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../SENSIRION/sensirion_i2c.c" selected="0" top="149" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="22" y="192" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../main.c" selected="1" top="167" codecName="Default"/>
  </Files>
  <ARMCrossStudioWindow activeProject="twi_scanner_pca10040" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Release" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="C:/nrf_sdk/nRF5_SDK_17.1.0_ddde560/examples/My Projects/Progetto_tesi/SENSIRION" debugSearchPath="" autoConnectCapabilities="3711"/>
 </session>

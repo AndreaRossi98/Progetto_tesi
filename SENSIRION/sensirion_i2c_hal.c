@@ -41,8 +41,8 @@
  * Nordic specific configuration. Change the pin numbers if you use other pins
  * than defined below.
  */
-#define SENSIRION_SDA_PIN 0
-#define SENSIRION_SCL_PIN 2
+#define SENSIRION_SDA_PIN 19        //cambiati, erano 0
+#define SENSIRION_SCL_PIN 20                        //2
 
 /**
  * Create new TWI instance. You may also use a different interface. In this
