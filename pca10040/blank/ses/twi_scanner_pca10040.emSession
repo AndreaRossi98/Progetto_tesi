@@ -2,6 +2,7 @@
 <session>
  <Bookmarks/>
  <Breakpoints groups="Breakpoints" active_group="Breakpoints">
+  <BreakpointListItem trigger="" line="16" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="../../../main.c" useHWbreakpoint="false"/>
   <Exceptions set="MemManage;UsageFault_Coprocessor;UsageFault_CheckingError;UsageFault_StateError;BusFault;ExceptionEntryReturnFault;HardFault"/>
  </Breakpoints>
  <ExecutionProfileWindow/>
@@ -28,11 +29,6 @@
   <ProjectSessionItem path="twi_scanner_pca10040;twi_scanner_pca10040;Board Definition"/>
   <ProjectSessionItem path="twi_scanner_pca10040;twi_scanner_pca10040;None"/>
   <ProjectSessionItem path="twi_scanner_pca10040;twi_scanner_pca10040;nRF_Drivers"/>
-  <ProjectSessionItem path="twi_scanner_pca10040;twi_scanner_pca10040;nRF_Libraries"/>
-  <ProjectSessionItem path="twi_scanner_pca10040;twi_scanner_pca10040;nRF_Log"/>
-  <ProjectSessionItem path="twi_scanner_pca10040;twi_scanner_pca10040;nRF_Segger_RTT"/>
-  <ProjectSessionItem path="twi_scanner_pca10040;twi_scanner_pca10040;Segger Startup Files"/>
-  <ProjectSessionItem path="twi_scanner_pca10040;twi_scanner_pca10040;SENSIRION"/>
  </Project>
  <Register1>
   <RegisterWindow visibleNodes="CPU - Current Context/r0;CPU - Current Context/r1;CPU - Current Context/r2;CPU - Current Context/r3;CPU - Current Context/r4;CPU - Current Context/r5;CPU - Current Context/r6;CPU - Current Context/r7;CPU - Current Context/r8;CPU - Current Context/r9;CPU - Current Context/r10;CPU - Current Context/r11;CPU - Current Context/r12;CPU - Current Context/sp(r13);CPU - Current Context/lr(r14);CPU - Current Context/pc(r15);CPU - Current Context/apsr;CPU/r0;CPU/r1;CPU/r2;CPU/r3;CPU/r4;CPU/r5;CPU/r6;CPU/r7;CPU/r8;CPU/r9;CPU/r10;CPU/r11;CPU/r12;CPU/sp(r13);CPU/lr(r14);CPU/pc(r15);CPU/xpsr;CPU/MSP;CPU/PSP;CPU/PRIMASK;CPU/BASEPRI;CPU/FAULTMASK;CPU/CONTROL;CPU/internal" binaryNodes="" asciiNodes="" openNodes="CPU - Current Context" name="twi_scanner_pca10040" decimalNodes="" octalNodes="" unsignedNodes=""/>
@@ -65,7 +61,11 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="22" y="192" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../main.c" selected="1" top="167" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="27" y="309" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../main.c" selected="1" top="298" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="211" useTextEdit="1" openedFrom="C:/nrf_sdk/nRF5_SDK_17.1.0_ddde560/examples/My Projects/Progetto_tesi/main.c" useBinaryEdit="0" left="0" path="../../../BME/bme68x.c" selected="0" top="205" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="7" y="225" useTextEdit="1" openedFrom="C:/nrf_sdk/nRF5_SDK_17.1.0_ddde560/examples/My Projects/Progetto_tesi/main.c" useBinaryEdit="0" left="0" path="../../../BME/bme68x.h" selected="0" top="209" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="23" y="309" useTextEdit="1" openedFrom="C:/nrf_sdk/nRF5_SDK_17.1.0_ddde560/examples/My Projects/Progetto_tesi/BME/bme68x.h" useBinaryEdit="0" left="0" path="../../../BME/bme68x_defs.h" selected="0" top="735" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="71" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../../../../modules/nrfx/mdk/ses_startup_nrf52.s" selected="0" top="68" codecName=""/>
  </Files>
  <ARMCrossStudioWindow activeProject="twi_scanner_pca10040" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Release" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="C:/nrf_sdk/nRF5_SDK_17.1.0_ddde560/examples/My Projects/Progetto_tesi/SENSIRION" debugSearchPath="" autoConnectCapabilities="3711"/>
 </session>

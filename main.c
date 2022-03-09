@@ -1,14 +1,20 @@
 #include <stdio.h>
+#include <stdint.h> //aggiunta dopo per vedere se cambia printf
 #include "boards.h"
 #include "app_util_platform.h"
 #include "app_error.h"
 #include "nrf_drv_twi.h"
 #include "nrf_delay.h"
+//#include "nrf_saadc.h"
+//#include "nrf_drv_saadc.h"
+#include "nrf.h"        //controlla se serve o meno
 
 
 //BME68 libraries
 #include "bme68x.h"
 #include "bme68x_defs.h"
+//#include "common.h"
+//#include "coines.h"
 
 //SENSIRION's sensor libraries
 #include "sensirion_common.h"
@@ -19,6 +25,7 @@
 #include "sps30.h"
 
 //ULPMS libraries   ancora da fare per nRF
+
 
 /* TWI instance ID. */
 #if TWI0_ENABLED
@@ -33,10 +40,7 @@
 /* TWI instance. */
 static const nrf_drv_twi_t m_twi = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID);
 
-
-/**
- * @brief TWI initialization.
- */
+/* TWI initialization*/
 void twi_init (void)
 {
     ret_code_t err_code;
@@ -56,19 +60,16 @@ void twi_init (void)
 }
 
 
-/**
- * @brief Function for main application entry.
- */
 int main(void)
 {
     ret_code_t err_code;
     uint8_t address;
     uint8_t sample_data;
     bool detected_device = false;
-
+   
+    printf("Starting the program\n \n\r");
     twi_init();
-
-
+    nrf_delay_ms(3000);
     
     for (address = 1; address <= TWI_ADDRESSES; address++)
     {
@@ -78,7 +79,7 @@ int main(void)
             detected_device = true;
             //NRF_LOG_INFO("TWI device detected at address 0x%x.", address);
             //printf("detect\n\r");
-            printf("TWI device detected at address 0x%x.\n\n\r", address);
+            printf("TWI device detected at address 0x%x.\n\r", address);
         }
         //NRF_LOG_FLUSH();
     }
@@ -90,8 +91,12 @@ int main(void)
         printf("nodetect\n\r");
     }
     
+    printf("\n");
 
-/*
+////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
+
     //  **********************
     //  *BEGINNING sps30 part*
     //  **********************
@@ -104,7 +109,6 @@ int main(void)
 
     
     //check if the sensor is ready to start and initialize it
-    
     while (sps30_probe() != 0) 
     {
         printf("probe failed\n\r");
@@ -121,18 +125,12 @@ int main(void)
     }
     nrf_delay_ms(10000);
 
-    for(int i=0; i < 20; i++)
+    for(int i=0; i < 10; i++)
     {
         nrf_delay_ms(1000);
         //sensirion_i2c_hal_sleep_usec(SPS30_MEASUREMENT_DURATION_USEC);
-        ret = sps30_read_measurement(&measurement);
 
-        //prova per cercare di sistemare la lettura dei dati
-        error = sensirion_i2c_write_cmd(SPS30_I2C_ADDRESS, SPS_CMD_READ_MEASUREMENT);
-        error = sensirion_i2c_read_words_as_bytes(SPS30_I2C_ADDRESS, &data[0][0],
-                                              SENSIRION_NUM_WORDS(data));
-        printf("Primo dato\n\r%d\n\r%d\n\r%d\n\r%d\n\r", data[1][0], data[1][1], data[1][2], data[1][3]);
-        //fine prova
+        ret = sps30_read_measurement(&measurement);
 
         if(ret < 0)
         {
@@ -140,8 +138,53 @@ int main(void)
         }
         else
         {
-            printf("PM 2.5: %g\n\r", measurement.mc_2p5);
-            //problemi su questa stampa, guarda formato numerico utilizzato e sistema SPS_CMD_START_MEASUREMENT_ARG
+            //stampa di tutti i valori letti(mass concentration and number concentration)
+            printf("Measurement n° %d:\n",i+1);            
+            int16_t intero;
+            int16_t decimale;
+            //mc_1p0
+            intero = measurement.mc_1p0;
+            decimale = (measurement.mc_1p0 - intero)*100;
+            printf("PM 1.0: %d.%d [µg/m³]\n\r", intero, decimale);
+            //mc_2p5
+            intero = measurement.mc_2p5;
+            decimale = (measurement.mc_2p5 - intero)*100;
+            printf("PM 2.5: %d.%d [µg/m³]\n\r", intero, decimale);
+            //mc_4p0
+            intero = measurement.mc_4p0;
+            decimale = (measurement.mc_4p0 - intero)*100;
+            printf("PM 4.0: %d.%d [µg/m³]\n\r", intero, decimale);
+            //mc_10p0
+            intero = measurement.mc_10p0;
+            decimale = (measurement.mc_10p0 - intero)*100;
+            printf("PM 10.0: %d.%d [µg/m³]\n\r", intero, decimale);
+
+            //mc_0p5
+            intero = measurement.nc_0p5;
+            decimale = (measurement.nc_0p5 - intero)*100;
+            printf("PM 0.5: %d.%d [#/cm³]\n\r", intero, decimale);
+            //mc_1p0
+            intero = measurement.nc_1p0;
+            decimale = (measurement.nc_1p0 - intero)*100;
+            printf("PM 1.0: %d.%d [#/cm³]\n\r", intero, decimale);
+            //mc_2p5
+            intero = measurement.nc_2p5;
+            decimale = (measurement.nc_2p5 - intero)*100;
+            printf("PM 2.5: %d.%d [#/cm³]\n\r", intero, decimale);
+            //mc_4p0
+            intero = measurement.nc_4p0;
+            decimale = (measurement.nc_4p0 - intero)*100;
+            printf("PM 4.0: %d.%d [#/cm³]\n\r", intero, decimale);
+            //mc_10p0
+            intero = measurement.nc_10p0;
+            decimale = (measurement.nc_10p0 - intero)*100;
+            printf("PM 10.0: %d.%d [#/cm³]\n\r", intero, decimale);
+
+            //typical particle size
+            intero = measurement.typical_particle_size;
+            decimale = (measurement.typical_particle_size - intero)*100;
+            printf("Typical particle size: %d.%d [nm]\n\r", intero, decimale);
+            printf("\n");
         }
     }
 
@@ -163,7 +206,7 @@ int main(void)
     //  ****************
     //  *end SPS30 part*
     //  ****************
-*/    
+    
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
@@ -172,8 +215,8 @@ int main(void)
     //  *BEGINNING SCD41 part*
     //  **********************
     
-    int16_t error = 0;
-    //error = 0;
+    //int16_t error = 0;
+    error = 0;
     //sensirion_i2c_hal_init();
 
     nrf_delay_ms(3000);
@@ -185,6 +228,7 @@ int main(void)
     //scd4x_reinit();       //sembra non servire, non ho ancora modificato alcun parametro
     nrf_delay_ms(500);
     error = scd4x_start_periodic_measurement();
+    //error = scd4x_start_low_power_periodic_measurement();
     if(error != 0)  printf("errore\n");
     else    printf("Periodic measurement started\n\n");
     scd4x_reinit();
@@ -205,14 +249,14 @@ int main(void)
 */
     printf("Waiting for first measurement... (5 sec)\n\n");
 
-    for (int i = 0;i<80;i++) 
+    for (int i = 0;i<20;i++) 
     {
         // Read Measurement
         sensirion_i2c_hal_sleep_usec(50000);
         bool data_ready_flag = false;
         nrf_delay_ms(5000);
         error = scd4x_get_data_ready_flag(&data_ready_flag);
-        //printf("qua arrivo.\n\r");
+
         if (error) 
         {
             printf("Error executing scd4x_get_data_ready_flag(): %i\n", error);
@@ -220,12 +264,10 @@ int main(void)
         }
         if (!data_ready_flag) 
         {
-            printf("qua arrivo punto 2\n\r");
             nrf_delay_ms(500);
             continue;
         }
         
-        //printf("qua arrivo punto 3\n\r");
         uint16_t co2;
         int32_t temperature;
         int32_t humidity;
@@ -240,6 +282,7 @@ int main(void)
         } 
         else 
         {
+            printf("Measurement n° %d:\n",i+1);
             printf("CO2: %u ppm\n", co2);
             printf("Temperature: %d m°C\n", temperature);
             printf("Humidity: %d mRH\n\n\n", humidity);
@@ -251,6 +294,78 @@ int main(void)
     //  *end SCD41 part*
     //  ****************
 
+////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
+
+    //  ***********************
+    //  *BEGINNING BME688 part*
+    //  ***********************
+
+    int8_t error_BME;
+    struct bme68x_dev bme;
+    struct bme68x_data dati_bme;
+    uint8_t num_data;
+
+    printf("INIZIO BME\n");
+
+    error_BME = bme68x_init(&bme);
+    if(error_BME < 0)   printf("Error initializing BME\n");
+    else printf("Initialization of BME\n");
+
+    nrf_delay_ms(1000);
+
+    error_BME = bme68x_set_op_mode(BME68X_SEQUENTIAL_MODE, &bme);
+    if(error_BME < 0)   printf("Error set operational mode\n");
+    else printf("Starting sequential mode\n");
+
+    nrf_delay_ms(1000);
+    
+    error_BME = bme68x_get_data( BME68X_SEQUENTIAL_MODE, &dati_bme, &num_data, &bme);
+    if(error_BME < 0)   printf("Error get data\n");
+    else 
+    {
+        printf("Getting data correctly\n");
+        printf("\n");
+        printf("Printing results\n");
+        printf("status: %d\n", dati_bme.status);
+        printf("Gas index: %d\n", dati_bme.gas_index);
+        printf("Meas index: %d\n", dati_bme.meas_index);
+        printf("Res heat: %d\n", dati_bme.res_heat);
+        printf("Current DAC: %d\n", dati_bme.idac);
+        printf("Gas wait period: %d\n", dati_bme.gas_wait);
+
+        int16_t intero;
+        int16_t decimale;
+
+        intero = dati_bme.temperature;
+        decimale = (dati_bme.temperature - intero)*100;
+        printf("Temperatura: %d.%d °C\n", intero, decimale);
+
+        intero = dati_bme.pressure;
+        decimale = (dati_bme.pressure - intero)*100;
+        printf("Pressione: %d.%d Pa\n", intero, decimale);
+
+        intero = dati_bme.humidity;
+        decimale = (dati_bme.humidity - intero)*100;
+        printf("Umidita': %d.%d %\n", intero,decimale);
+
+        intero = dati_bme.gas_resistance;
+        decimale = (dati_bme.gas_resistance - intero)*100;
+        printf("Gas resistance: %d.%d O\n\n", intero, decimale);
+    }
+
+    printf("End of measurement!\n");
+
+
+    
+   
+
+
+
+
+
+    
 
 
     while (true)
