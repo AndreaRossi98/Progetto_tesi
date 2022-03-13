@@ -192,7 +192,7 @@ int8_t bme68x_set_regs(const uint8_t *reg_addr, const uint8_t *reg_data, uint32_
             /* Interleave the 2 arrays */
             for (index = 0; index < len; index++)
             {
-                if (dev->intf == BME68X_SPI_INTF)
+                if (dev->intf == BME68X_I2C_INTF)
                 {
                     /* Set the memory page */
                     rslt = set_mem_page(reg_addr[index], dev);
@@ -240,7 +240,7 @@ int8_t bme68x_get_regs(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, struct
     rslt = null_ptr_check(dev);
     if ((rslt == BME68X_OK) && reg_data)
     {
-        if (dev->intf == BME68X_SPI_INTF)
+        if (dev->intf == BME68X_I2C_INTF)
         {
             /* Set the memory page */
             rslt = set_mem_page(reg_addr, dev);
@@ -279,7 +279,7 @@ int8_t bme68x_soft_reset(struct bme68x_dev *dev)
     rslt = null_ptr_check(dev);
     if (rslt == BME68X_OK)
     {
-        if (dev->intf == BME68X_SPI_INTF)
+        if (dev->intf == BME68X_I2C_INTF)
         {
             rslt = get_mem_page(dev);
         }
@@ -294,7 +294,7 @@ int8_t bme68x_soft_reset(struct bme68x_dev *dev)
             if (rslt == BME68X_OK)
             {
                 /* After reset get the memory page */
-                if (dev->intf == BME68X_SPI_INTF)
+                if (dev->intf == BME68X_I2C_INTF)
                 {
                     rslt = get_mem_page(dev);
                 }

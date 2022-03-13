@@ -1,18 +1,24 @@
 #include <stdio.h>
 #include <stdint.h> //aggiunta dopo per vedere se cambia printf
 #include "boards.h"
+#include "nrf.h"
+#include "nordic_common.h"
 #include "app_util_platform.h"
 #include "app_error.h"
 #include "nrf_drv_twi.h"
 #include "nrf_delay.h"
+#include "nrf_log.h"
+#include "nrf_log_ctrl.h"
+#include "nrf_log_default_backends.h"
 //#include "nrf_saadc.h"
 //#include "nrf_drv_saadc.h"
-#include "nrf.h"        //controlla se serve o meno
+       
 
 
 //BME68 libraries
 #include "bme68x.h"
 #include "bme68x_defs.h"
+#define SAMPLE_COUNT  UINT16_C(300)
 //#include "common.h"
 //#include "coines.h"
 
@@ -46,8 +52,8 @@ void twi_init (void)
     ret_code_t err_code;
 
     const nrf_drv_twi_config_t twi_config = {
-       .scl                = 20,
-       .sda                = 19,
+       .scl                = 19,
+       .sda                = 18,
        .frequency          = NRF_DRV_TWI_FREQ_100K,
        .interrupt_priority = APP_IRQ_PRIORITY_HIGH,
        .clear_bus_init     = false
@@ -59,6 +65,11 @@ void twi_init (void)
     nrf_drv_twi_enable(&m_twi);
 }
 
+void log_init(void)
+{
+    APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
+    NRF_LOG_DEFAULT_BACKENDS_INIT();
+}
 
 int main(void)
 {
@@ -66,10 +77,13 @@ int main(void)
     uint8_t address;
     uint8_t sample_data;
     bool detected_device = false;
-   
+
     printf("Starting the program\n \n\r");
+    //log_init();
+    //NRF_LOG_INFO("This is log data from nordic device..");
     twi_init();
     nrf_delay_ms(3000);
+
     
     for (address = 1; address <= TWI_ADDRESSES; address++)
     {
@@ -88,7 +102,7 @@ int main(void)
     {
         //NRF_LOG_INFO("No device was found.");
         //NRF_LOG_FLUSH();
-        printf("nodetect\n\r");
+        printf("no detect\n\r");
     }
     
     printf("\n");
@@ -96,7 +110,7 @@ int main(void)
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
-
+/*
     //  **********************
     //  *BEGINNING sps30 part*
     //  **********************
@@ -206,7 +220,7 @@ int main(void)
     //  ****************
     //  *end SPS30 part*
     //  ****************
-    
+ */  
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
@@ -215,41 +229,30 @@ int main(void)
     //  *BEGINNING SCD41 part*
     //  **********************
     
-    //int16_t error = 0;
-    error = 0;
-    //sensirion_i2c_hal_init();
+    int16_t error = 0;
+    //error = 0;
+    uint16_t status;
+    uint16_t target_co2_concentration;
+    uint16_t* frc_correction;
 
-    nrf_delay_ms(3000);
+    target_co2_concentration = 400;
 
-    // Clean up potential SCD40 states
     scd4x_wake_up();
     scd4x_stop_periodic_measurement();
-    nrf_delay_ms(500);  //dopo stop aspettare almeno 500 ms
-    //scd4x_reinit();       //sembra non servire, non ho ancora modificato alcun parametro
-    nrf_delay_ms(500);
+    //nrf_delay_ms(500);  //dopo stop aspettare almeno 500 ms
+    scd4x_reinit();       //sembra non servire, non ho ancora modificato alcun parametro
+    nrf_delay_ms(1000);
+    
     error = scd4x_start_periodic_measurement();
     //error = scd4x_start_low_power_periodic_measurement();
+    //nrf_delay_ms(1000);
+
     if(error != 0)  printf("errore\n");
     else    printf("Periodic measurement started\n\n");
-    scd4x_reinit();
-    nrf_delay_ms(5000);
 
-    uint16_t serial_0;
-    uint16_t serial_1;
-    uint16_t serial_2;
-    /*error = scd4x_get_serial_number(&serial_0, &serial_1, &serial_2);     non mi serve, da un errore che non capisco
-    if (error) //se non è zero stampa                                       funziona senza
-    {
-        printf("Error executing scd4x_get_serial_number(): %i\n", error);       //error 2
-    } 
-    else 
-    {
-        printf("serial: 0x%04x%04x%04x\n", serial_0, serial_1, serial_2);
-    }
-*/
     printf("Waiting for first measurement... (5 sec)\n\n");
 
-    for (int i = 0;i<20;i++) 
+    for (int i = 0;i<40;i++) 
     {
         // Read Measurement
         sensirion_i2c_hal_sleep_usec(50000);
@@ -264,7 +267,8 @@ int main(void)
         }
         if (!data_ready_flag) 
         {
-            nrf_delay_ms(500);
+            //nrf_delay_ms(500);
+            printf("sono qua  \n");
             continue;
         }
         
@@ -284,12 +288,14 @@ int main(void)
         {
             printf("Measurement n° %d:\n",i+1);
             printf("CO2: %u ppm\n", co2);
-            printf("Temperature: %d m°C\n", temperature);
-            printf("Humidity: %d mRH\n\n\n", humidity);
+            //printf("Temperature: %d m°C\n", temperature);
+            //printf("Humidity: %d mRH\n\n\n", humidity);
         }
 
     }
+    scd4x_stop_periodic_measurement();
     printf("FINE MISURAZIONI\n\n\n");
+    
     //  ****************
     //  *end SCD41 part*
     //  ****************
@@ -297,62 +303,93 @@ int main(void)
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
-
+/*
     //  ***********************
     //  *BEGINNING BME688 part*
     //  ***********************
 
-    int8_t error_BME;
+    int8_t rslt;
     struct bme68x_dev bme;
     struct bme68x_data dati_bme;
-    uint8_t num_data;
+    uint8_t n_fields;
+    struct bme68x_conf conf;
+    struct bme68x_heatr_conf heatr_conf;
+    uint32_t del_period;
+    uint32_t time_ms;
+    uint16_t sample_count = 1;
 
     printf("INIZIO BME\n");
 
-    error_BME = bme68x_init(&bme);
-    if(error_BME < 0)   printf("Error initializing BME\n");
+    bme.intf = BME68X_I2C_INTF;
+
+    //rslt = bme68x_interface_init(&bme, BME68X_I2C_INTF);
+    printf("ARRIVO QUA\n");
+    rslt = bme68x_init(&bme);
+    printf("ARRIVO QUA?\n");
+    if(rslt < 0)   printf("Error initializing BME\n");
     else printf("Initialization of BME\n");
 
     nrf_delay_ms(1000);
-
-    error_BME = bme68x_set_op_mode(BME68X_SEQUENTIAL_MODE, &bme);
-    if(error_BME < 0)   printf("Error set operational mode\n");
-    else printf("Starting sequential mode\n");
-
-    nrf_delay_ms(1000);
     
-    error_BME = bme68x_get_data( BME68X_SEQUENTIAL_MODE, &dati_bme, &num_data, &bme);
-    if(error_BME < 0)   printf("Error get data\n");
-    else 
+    conf.filter = BME68X_FILTER_OFF;
+    conf.odr = BME68X_ODR_NONE;
+    conf.os_hum = BME68X_OS_16X;
+    conf.os_pres = BME68X_OS_1X;
+    conf.os_temp = BME68X_OS_2X;
+    rslt = bme68x_set_conf(&conf, &bme);
+    if(rslt < 0)   printf("Error configuting BME\n");
+    else printf("BME configured\n");
+
+    heatr_conf.enable = BME68X_ENABLE;
+    heatr_conf.heatr_temp = 300;
+    heatr_conf.heatr_dur = 100;
+    rslt = bme68x_set_heatr_conf(BME68X_FORCED_MODE, &heatr_conf, &bme);
+    if(rslt < 0)   printf("Error set gas configuration\n");
+    else printf("Gas configuration correctly set\n");
+
+    printf("Sample, TimeStamp(ms), Temperature(deg C), Pressure(Pa), Humidity(%%), Gas resistance(ohm), Status\n");
+    
+    while (sample_count <= SAMPLE_COUNT)
     {
-        printf("Getting data correctly\n");
-        printf("\n");
-        printf("Printing results\n");
-        printf("status: %d\n", dati_bme.status);
-        printf("Gas index: %d\n", dati_bme.gas_index);
-        printf("Meas index: %d\n", dati_bme.meas_index);
-        printf("Res heat: %d\n", dati_bme.res_heat);
-        printf("Current DAC: %d\n", dati_bme.idac);
-        printf("Gas wait period: %d\n", dati_bme.gas_wait);
+        rslt = bme68x_set_op_mode(BME68X_FORCED_MODE, &bme);
+        if(rslt < 0)   printf("Error set operational mode\n");
+        else printf("Starting forced mode\n");
 
-        int16_t intero;
-        int16_t decimale;
+        rslt = bme68x_get_data(BME68X_FORCED_MODE, &dati_bme, &n_fields, &bme);
+        if(rslt < 0)   printf("Error get data\n");
+        else printf("Getting data\n");
 
-        intero = dati_bme.temperature;
-        decimale = (dati_bme.temperature - intero)*100;
-        printf("Temperatura: %d.%d °C\n", intero, decimale);
+        if(n_fields)
+        {
+            printf("Getting data correctly\n");
+            printf("\n");
+            printf("Printing results\n");
+            printf("status: %d\n", dati_bme.status);
+            printf("Gas index: %d\n", dati_bme.gas_index);
+            printf("Meas index: %d\n", dati_bme.meas_index);
+            printf("Res heat: %d\n", dati_bme.res_heat);
+            printf("Current DAC: %d\n", dati_bme.idac);
+            printf("Gas wait period: %d\n", dati_bme.gas_wait);
 
-        intero = dati_bme.pressure;
-        decimale = (dati_bme.pressure - intero)*100;
-        printf("Pressione: %d.%d Pa\n", intero, decimale);
+            int16_t intero;
+            int16_t decimale;
 
-        intero = dati_bme.humidity;
-        decimale = (dati_bme.humidity - intero)*100;
-        printf("Umidita': %d.%d %\n", intero,decimale);
+            intero = dati_bme.temperature;
+            decimale = (dati_bme.temperature - intero)*100;
+            printf("Temperatura: %d.%d °C\n", intero, decimale);
 
-        intero = dati_bme.gas_resistance;
-        decimale = (dati_bme.gas_resistance - intero)*100;
-        printf("Gas resistance: %d.%d O\n\n", intero, decimale);
+            intero = dati_bme.pressure;
+            decimale = (dati_bme.pressure - intero)*100;
+            printf("Pressione: %d.%d Pa\n", intero, decimale);
+
+            intero = dati_bme.humidity;
+            decimale = (dati_bme.humidity - intero)*100;
+            printf("Umidita': %d.%d %\n", intero,decimale);
+
+            intero = dati_bme.gas_resistance;
+            decimale = (dati_bme.gas_resistance - intero)*100;
+            printf("Gas resistance: %d.%d O\n\n", intero, decimale);
+        }
     }
 
     printf("End of measurement!\n");
@@ -367,7 +404,7 @@ int main(void)
 
     
 
-
+*/
     while (true)
     {
     }
