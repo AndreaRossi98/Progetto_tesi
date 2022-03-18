@@ -1,7 +1,8 @@
 <!DOCTYPE CrossStudio_Session_File>
 <session>
  <Bookmarks/>
- <Breakpoints groups="Breakpoints" active_group="Breakpoints">
+ <Breakpoints groups="Breakpoints;V7M Exceptions" active_group="Breakpoints">
+  <BreakpointListItem trigger="" line="120" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="../../../../../../integration/nrfx/legacy/nrf_drv_twi.h" useHWbreakpoint="false"/>
   <Exceptions set="MemManage;UsageFault_Coprocessor;UsageFault_CheckingError;UsageFault_StateError;BusFault;ExceptionEntryReturnFault;HardFault"/>
  </Breakpoints>
  <ExecutionProfileWindow/>
@@ -62,10 +63,14 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="4" y="252" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../main.c" selected="1" top="258" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="25" y="55" useTextEdit="1" openedFrom="C:/nrf_sdk/nRF5_SDK_17.1.0_ddde560/examples/My Projects/Progetto_tesi/main.c" useBinaryEdit="0" left="0" path="../../../SENSIRION/scd4x_i2c.h" selected="0" top="39" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="21" y="63" useTextEdit="1" openedFrom="C:/nrf_sdk/nRF5_SDK_17.1.0_ddde560/examples/My Projects/Progetto_tesi/main.c" useBinaryEdit="0" left="0" path="../../../../../../components/libraries/delay/nrf_delay.h" selected="0" top="49" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="4" y="49" useTextEdit="1" openedFrom="C:/nrf_sdk/nRF5_SDK_17.1.0_ddde560/examples/My Projects/Progetto_tesi/SENSIRION/scd4x_i2c.h" useBinaryEdit="0" left="0" path="../../../SENSIRION/scd4x_i2c.c" selected="0" top="33" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="80" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../main.c" selected="1" top="67" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="40" y="49" useTextEdit="1" openedFrom="C:/nrf_sdk/nRF5_SDK_17.1.0_ddde560/examples/My Projects/Progetto_tesi/main.c" useBinaryEdit="0" left="0" path="../../../BME/common.c" selected="0" top="22" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="66" y="50" useTextEdit="1" openedFrom="C:/nrf_sdk/nRF5_SDK_17.1.0_ddde560/examples/My Projects/Progetto_tesi/BME/common.c" useBinaryEdit="0" left="0" path="../../../SENSIRION/sensirion_i2c_hal.c" selected="0" top="43" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="87" y="52" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../BME/common.h" selected="0" top="26" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="34" y="146" useTextEdit="1" openedFrom="C:/nrf_sdk/nRF5_SDK_17.1.0_ddde560/examples/My Projects/Progetto_tesi/main.c" useBinaryEdit="0" left="0" path="../../../BME/bme68x.c" selected="0" top="133" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="23" y="955" useTextEdit="1" openedFrom="C:/nrf_sdk/nRF5_SDK_17.1.0_ddde560/examples/My Projects/Progetto_tesi/BME/bme68x.c" useBinaryEdit="0" left="0" path="../../../BME/bme68x_defs.h" selected="0" top="942" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="6" y="107" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../../../../integration/nrfx/legacy/nrf_drv_twi.h" selected="0" top="99" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="550" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../../../../modules/nrfx/drivers/src/nrfx_twim.c" selected="0" top="537" codecName=""/>
  </Files>
- <ARMCrossStudioWindow activeProject="twi_scanner_pca10040" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Release" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="C:/nrf_sdk/nRF5_SDK_17.1.0_ddde560/examples/My Projects/Progetto_tesi/SENSIRION" debugSearchPath="" autoConnectCapabilities="3711"/>
+ <ARMCrossStudioWindow activeProject="twi_scanner_pca10040" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Release" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="C:/nrf_sdk/nRF5_SDK_17.1.0_ddde560/examples/My Projects/Progetto_tesi/BME" debugSearchPath="" autoConnectCapabilities="3711"/>
 </session>

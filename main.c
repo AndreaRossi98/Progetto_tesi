@@ -19,8 +19,8 @@
 #include "bme68x.h"
 #include "bme68x_defs.h"
 #define SAMPLE_COUNT  UINT16_C(300)
-//#include "common.h"
-//#include "coines.h"
+#include "common.h"
+
 
 //SENSIRION's sensor libraries
 #include "sensirion_common.h"
@@ -79,8 +79,8 @@ int main(void)
     bool detected_device = false;
 
     printf("Starting the program\n \n\r");
-    //log_init();
-    //NRF_LOG_INFO("This is log data from nordic device..");
+    log_init();
+    NRF_LOG_INFO("This is log data from nordic device..");
     twi_init();
     nrf_delay_ms(3000);
 
@@ -91,7 +91,7 @@ int main(void)
         if (err_code == NRF_SUCCESS)
         {
             detected_device = true;
-            //NRF_LOG_INFO("TWI device detected at address 0x%x.", address);
+            NRF_LOG_INFO("TWI device detected at address 0x%x.", address);
             //printf("detect\n\r");
             printf("TWI device detected at address 0x%x.\n\r", address);
         }
@@ -100,12 +100,14 @@ int main(void)
 
     if (!detected_device)
     {
-        //NRF_LOG_INFO("No device was found.");
-        //NRF_LOG_FLUSH();
+        NRF_LOG_INFO("No device was found.");
+        NRF_LOG_FLUSH();
         printf("no detect\n\r");
     }
-    
+
+    NRF_LOG_FLUSH();
     printf("\n");
+    nrf_delay_ms(3000);
 
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
@@ -120,7 +122,8 @@ int main(void)
     int16_t error;
     uint8_t data[10][4];
     #define SPS_CMD_READ_MEASUREMENT 0x0300
-
+    
+    sps30_stop_measurement(); //provato ad aggiungere per vedere se risolve problema del probe failed ripetuto
     
     //check if the sensor is ready to start and initialize it
     while (sps30_probe() != 0) 
@@ -139,7 +142,7 @@ int main(void)
     }
     nrf_delay_ms(10000);
 
-    for(int i=0; i < 10; i++)
+    for(int i=0; i < 2; i++)
     {
         nrf_delay_ms(1000);
         //sensirion_i2c_hal_sleep_usec(SPS30_MEASUREMENT_DURATION_USEC);
@@ -220,17 +223,17 @@ int main(void)
     //  ****************
     //  *end SPS30 part*
     //  ****************
- */  
+*/   
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
-
+/*
     //  **********************
     //  *BEGINNING SCD41 part*
     //  **********************
     
-    int16_t error = 0;
-    //error = 0;
+    //int16_t error = 0;
+    error = 0;
     uint16_t status;
     uint16_t target_co2_concentration;
     uint16_t* frc_correction;
@@ -252,7 +255,7 @@ int main(void)
 
     printf("Waiting for first measurement... (5 sec)\n\n");
 
-    for (int i = 0;i<40;i++) 
+    for (int i = 0;i<5;i++) 
     {
         // Read Measurement
         sensirion_i2c_hal_sleep_usec(50000);
@@ -299,11 +302,11 @@ int main(void)
     //  ****************
     //  *end SCD41 part*
     //  ****************
+*/
+////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
-/*
     //  ***********************
     //  *BEGINNING BME688 part*
     //  ***********************
@@ -317,15 +320,18 @@ int main(void)
     uint32_t del_period;
     uint32_t time_ms;
     uint16_t sample_count = 1;
-
     printf("INIZIO BME\n");
+    //bme.intf_ptr = TWI_INSTANCE_ID;       non dovrebbe servire
+    nrf_delay_ms(1000);
 
-    bme.intf = BME68X_I2C_INTF;
 
-    //rslt = bme68x_interface_init(&bme, BME68X_I2C_INTF);
-    printf("ARRIVO QUA\n");
+    rslt = bme68x_interface_init(&bme, BME68X_I2C_INTF); //controllare che le modifiche fatte vadano bene
+    nrf_delay_ms(1000); //non necessario
+    printf("Mi fermo qua\n");
+    bme68x_check_rslt("bme68x_interface_init", rslt);
     rslt = bme68x_init(&bme);
-    printf("ARRIVO QUA?\n");
+    printf("errore %d: \n",rslt);
+    
     if(rslt < 0)   printf("Error initializing BME\n");
     else printf("Initialization of BME\n");
 
@@ -347,7 +353,7 @@ int main(void)
     if(rslt < 0)   printf("Error set gas configuration\n");
     else printf("Gas configuration correctly set\n");
 
-    printf("Sample, TimeStamp(ms), Temperature(deg C), Pressure(Pa), Humidity(%%), Gas resistance(ohm), Status\n");
+    //printf("Sample, TimeStamp(ms), Temperature(deg C), Pressure(Pa), Humidity(%%), Gas resistance(ohm), Status\n");
     
     while (sample_count <= SAMPLE_COUNT)
     {
@@ -392,6 +398,8 @@ int main(void)
         }
     }
 
+    
+
     printf("End of measurement!\n");
 
 
@@ -404,7 +412,7 @@ int main(void)
 
     
 
-*/
+
     while (true)
     {
     }

@@ -144,7 +144,6 @@ static int8_t analyze_sensor_data(const struct bme68x_data *data, uint8_t n_meas
 int8_t bme68x_init(struct bme68x_dev *dev)
 {
     int8_t rslt;
-
     rslt = bme68x_soft_reset(dev);
     if (rslt == BME68X_OK)
     {
@@ -251,6 +250,7 @@ int8_t bme68x_get_regs(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, struct
         }
 
         dev->intf_rslt = dev->read(reg_addr, reg_data, len, dev->intf_ptr);
+
         if (dev->intf_rslt != 0)
         {
             rslt = BME68X_E_COM_FAIL;
@@ -472,7 +472,6 @@ int8_t bme68x_get_op_mode(uint8_t *op_mode, struct bme68x_dev *dev)
     if (op_mode)
     {
         rslt = bme68x_get_regs(BME68X_REG_CTRL_MEAS, &mode, 1, dev);
-
         /* Masking the other register bit info*/
         *op_mode = mode & BME68X_MODE_MSK;
     }

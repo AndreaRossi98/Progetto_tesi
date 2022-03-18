@@ -1959,7 +1959,6 @@
 #endif
 
 // </e>
-
 // <e> SAADC_CONFIG_LOG_ENABLED - Enables logging in the module.
 //==========================================================
 #ifndef SAADC_CONFIG_LOG_ENABLED
