@@ -38,6 +38,7 @@
 
 #include "bme68x.h"
 #include <stdio.h>
+#include "common.h"
 
 /* This internal API is used to read the calibration coefficients */
 static int8_t get_calib_data(struct bme68x_dev *dev);
@@ -281,7 +282,9 @@ int8_t bme68x_soft_reset(struct bme68x_dev *dev)
     {
         if (dev->intf == BME68X_I2C_INTF)
         {
+            
             rslt = get_mem_page(dev);
+            
         }
 
         /* Reset the device */
@@ -1408,7 +1411,9 @@ static int8_t get_mem_page(struct bme68x_dev *dev)
     rslt = null_ptr_check(dev);
     if (rslt == BME68X_OK)
     {
+        
         dev->intf_rslt = dev->read(BME68X_REG_MEM_PAGE | BME68X_SPI_RD_MSK, &reg, 1, dev->intf_ptr);
+        
         if (dev->intf_rslt != 0)
         {
             rslt = BME68X_E_COM_FAIL;

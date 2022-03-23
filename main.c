@@ -29,6 +29,8 @@
 #include "sensirion_i2c_hal.h"
 #include "scd4x_i2c.h"
 #include "sps30.h"
+#include "reading_sps30.h"
+#include "reading_scd41.h"
 
 //ULPMS libraries   ancora da fare per nRF
 
@@ -78,9 +80,8 @@ int main(void)
     uint8_t sample_data;
     bool detected_device = false;
 
-    printf("Starting the program\n \n\r");
     log_init();
-    NRF_LOG_INFO("This is log data from nordic device..");
+    NRF_LOG_INFO("Starting the program");
     twi_init();
     nrf_delay_ms(3000);
 
@@ -92,10 +93,9 @@ int main(void)
         {
             detected_device = true;
             NRF_LOG_INFO("TWI device detected at address 0x%x.", address);
-            //printf("detect\n\r");
-            printf("TWI device detected at address 0x%x.\n\r", address);
+            //printf("detect\n\r"); printf("TWI device detected at address 0x%x.\n\r", address);
         }
-        //NRF_LOG_FLUSH();
+        NRF_LOG_FLUSH();
     }
 
     if (!detected_device)
@@ -109,204 +109,11 @@ int main(void)
     printf("\n");
     nrf_delay_ms(3000);
 
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
-/*
-    //  **********************
-    //  *BEGINNING sps30 part*
-    //  **********************
-    
-    struct sps30_measurement measurement;
-    int16_t ret;
-    int16_t error;
-    uint8_t data[10][4];
-    #define SPS_CMD_READ_MEASUREMENT 0x0300
-    
-    sps30_stop_measurement(); //provato ad aggiungere per vedere se risolve problema del probe failed ripetuto
-    
-    //check if the sensor is ready to start and initialize it
-    while (sps30_probe() != 0) 
-    {
-        printf("probe failed\n\r");
-        nrf_delay_ms(1000);
-    }
-    printf("probe succeeded\n\r");
 
+    lettura_sps30(2);
+    lettura_scd41(2);
 
-    //start measurement and wait for 10s to ensure the sensor has a
-    //stable flow and possible remaining particles are cleaned out
-    if (sps30_start_measurement() != 0) 
-    {
-        printf("error starting measurement\n\r");
-    }
-    nrf_delay_ms(10000);
-
-    for(int i=0; i < 2; i++)
-    {
-        nrf_delay_ms(1000);
-        //sensirion_i2c_hal_sleep_usec(SPS30_MEASUREMENT_DURATION_USEC);
-
-        ret = sps30_read_measurement(&measurement);
-
-        if(ret < 0)
-        {
-            printf("read measurement failed\n\r");
-        }
-        else
-        {
-            //stampa di tutti i valori letti(mass concentration and number concentration)
-            printf("Measurement n° %d:\n",i+1);            
-            int16_t intero;
-            int16_t decimale;
-            //mc_1p0
-            intero = measurement.mc_1p0;
-            decimale = (measurement.mc_1p0 - intero)*100;
-            printf("PM 1.0: %d.%d [µg/m³]\n\r", intero, decimale);
-            //mc_2p5
-            intero = measurement.mc_2p5;
-            decimale = (measurement.mc_2p5 - intero)*100;
-            printf("PM 2.5: %d.%d [µg/m³]\n\r", intero, decimale);
-            //mc_4p0
-            intero = measurement.mc_4p0;
-            decimale = (measurement.mc_4p0 - intero)*100;
-            printf("PM 4.0: %d.%d [µg/m³]\n\r", intero, decimale);
-            //mc_10p0
-            intero = measurement.mc_10p0;
-            decimale = (measurement.mc_10p0 - intero)*100;
-            printf("PM 10.0: %d.%d [µg/m³]\n\r", intero, decimale);
-
-            //mc_0p5
-            intero = measurement.nc_0p5;
-            decimale = (measurement.nc_0p5 - intero)*100;
-            printf("PM 0.5: %d.%d [#/cm³]\n\r", intero, decimale);
-            //mc_1p0
-            intero = measurement.nc_1p0;
-            decimale = (measurement.nc_1p0 - intero)*100;
-            printf("PM 1.0: %d.%d [#/cm³]\n\r", intero, decimale);
-            //mc_2p5
-            intero = measurement.nc_2p5;
-            decimale = (measurement.nc_2p5 - intero)*100;
-            printf("PM 2.5: %d.%d [#/cm³]\n\r", intero, decimale);
-            //mc_4p0
-            intero = measurement.nc_4p0;
-            decimale = (measurement.nc_4p0 - intero)*100;
-            printf("PM 4.0: %d.%d [#/cm³]\n\r", intero, decimale);
-            //mc_10p0
-            intero = measurement.nc_10p0;
-            decimale = (measurement.nc_10p0 - intero)*100;
-            printf("PM 10.0: %d.%d [#/cm³]\n\r", intero, decimale);
-
-            //typical particle size
-            intero = measurement.typical_particle_size;
-            decimale = (measurement.typical_particle_size - intero)*100;
-            printf("Typical particle size: %d.%d [nm]\n\r", intero, decimale);
-            printf("\n");
-        }
-    }
-
-    
-    
-    nrf_delay_ms(1000);
-    //ret = sps30_start_manual_fan_cleaning();
-    nrf_delay_ms(1000);
-    if (ret < 0)
-    {}
-    else  printf("Fan manual cleaning\r\n\n");
-
-    nrf_delay_ms(1000);
-    ret = sps30_stop_measurement();
-    nrf_delay_ms(1000);
-    if(ret < 0)
-    {}
-    else  printf("Measurement stopped\n\n\r");
-    //  ****************
-    //  *end SPS30 part*
-    //  ****************
-*/   
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
-/*
-    //  **********************
-    //  *BEGINNING SCD41 part*
-    //  **********************
-    
-    //int16_t error = 0;
-    error = 0;
-    uint16_t status;
-    uint16_t target_co2_concentration;
-    uint16_t* frc_correction;
-
-    target_co2_concentration = 400;
-
-    scd4x_wake_up();
-    scd4x_stop_periodic_measurement();
-    //nrf_delay_ms(500);  //dopo stop aspettare almeno 500 ms
-    scd4x_reinit();       //sembra non servire, non ho ancora modificato alcun parametro
-    nrf_delay_ms(1000);
-    
-    error = scd4x_start_periodic_measurement();
-    //error = scd4x_start_low_power_periodic_measurement();
-    //nrf_delay_ms(1000);
-
-    if(error != 0)  printf("errore\n");
-    else    printf("Periodic measurement started\n\n");
-
-    printf("Waiting for first measurement... (5 sec)\n\n");
-
-    for (int i = 0;i<5;i++) 
-    {
-        // Read Measurement
-        sensirion_i2c_hal_sleep_usec(50000);
-        bool data_ready_flag = false;
-        nrf_delay_ms(5000);
-        error = scd4x_get_data_ready_flag(&data_ready_flag);
-
-        if (error) 
-        {
-            printf("Error executing scd4x_get_data_ready_flag(): %i\n", error);
-            continue;
-        }
-        if (!data_ready_flag) 
-        {
-            //nrf_delay_ms(500);
-            printf("sono qua  \n");
-            continue;
-        }
-        
-        uint16_t co2;
-        int32_t temperature;
-        int32_t humidity;
-        error = scd4x_read_measurement(&co2, &temperature, &humidity);
-        if (error) 
-        {
-            printf("Error executing scd4x_read_measurement(): %i\n", error);
-        } 
-        else if (co2 == 0) 
-        {
-            printf("Invalid sample detected, skipping.\n");
-        } 
-        else 
-        {
-            printf("Measurement n° %d:\n",i+1);
-            printf("CO2: %u ppm\n", co2);
-            //printf("Temperature: %d m°C\n", temperature);
-            //printf("Humidity: %d mRH\n\n\n", humidity);
-        }
-
-    }
-    scd4x_stop_periodic_measurement();
-    printf("FINE MISURAZIONI\n\n\n");
-    
-    //  ****************
-    //  *end SCD41 part*
-    //  ****************
-*/
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //  ***********************
     //  *BEGINNING BME688 part*
     //  ***********************
@@ -321,19 +128,17 @@ int main(void)
     uint32_t time_ms;
     uint16_t sample_count = 1;
     printf("INIZIO BME\n");
-    //bme.intf_ptr = TWI_INSTANCE_ID;       non dovrebbe servire
+    //bme.intf_ptr = TWI_INSTANCE_ID;       //non dovrebbe servire
     nrf_delay_ms(1000);
 
 
     rslt = bme68x_interface_init(&bme, BME68X_I2C_INTF); //controllare che le modifiche fatte vadano bene
     nrf_delay_ms(1000); //non necessario
-    printf("Mi fermo qua\n");
-    bme68x_check_rslt("bme68x_interface_init", rslt);
+    bme68x_check_rslt("bme68x_interface_init", rslt);   //modificato, se tutto ok stampa tutto ok
+    NRF_LOG_FLUSH();
     rslt = bme68x_init(&bme);
-    printf("errore %d: \n",rslt);
-    
-    if(rslt < 0)   printf("Error initializing BME\n");
-    else printf("Initialization of BME\n");
+    bme68x_check_rslt("bme68x_init", rslt);
+    NRF_LOG_FLUSH();
 
     nrf_delay_ms(1000);
     
@@ -343,20 +148,19 @@ int main(void)
     conf.os_pres = BME68X_OS_1X;
     conf.os_temp = BME68X_OS_2X;
     rslt = bme68x_set_conf(&conf, &bme);
-    if(rslt < 0)   printf("Error configuting BME\n");
-    else printf("BME configured\n");
+    bme68x_check_rslt("bme68x_set_conf", rslt);
 
     heatr_conf.enable = BME68X_ENABLE;
     heatr_conf.heatr_temp = 300;
     heatr_conf.heatr_dur = 100;
     rslt = bme68x_set_heatr_conf(BME68X_FORCED_MODE, &heatr_conf, &bme);
-    if(rslt < 0)   printf("Error set gas configuration\n");
-    else printf("Gas configuration correctly set\n");
+    bme68x_check_rslt("bme68x_set_heatr_conf", rslt);
 
     //printf("Sample, TimeStamp(ms), Temperature(deg C), Pressure(Pa), Humidity(%%), Gas resistance(ohm), Status\n");
     
     while (sample_count <= SAMPLE_COUNT)
     {
+        nrf_delay_ms(2000);
         rslt = bme68x_set_op_mode(BME68X_FORCED_MODE, &bme);
         if(rslt < 0)   printf("Error set operational mode\n");
         else printf("Starting forced mode\n");
@@ -401,16 +205,6 @@ int main(void)
     
 
     printf("End of measurement!\n");
-
-
-    
-   
-
-
-
-
-
-    
 
 
     while (true)
