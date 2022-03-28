@@ -26,6 +26,7 @@
 "Output/Release/Obj/twi_scanner_pca10040/nrfx_twim.o"
 "Output/Release/Obj/twi_scanner_pca10040/nrfx_uart.o"
 "Output/Release/Obj/twi_scanner_pca10040/nrfx_uarte.o"
+"Output/Release/Obj/twi_scanner_pca10040/nrfx_saadc.o"
 "Output/Release/Obj/twi_scanner_pca10040/main.o"
 "Output/Release/Obj/twi_scanner_pca10040/reading_sps30.o"
 "Output/Release/Obj/twi_scanner_pca10040/reading_scd41.o"

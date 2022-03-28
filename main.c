@@ -13,8 +13,6 @@
 //#include "nrf_saadc.h"
 //#include "nrf_drv_saadc.h"
        
-
-
 //BME68 libraries
 #include "bme68x.h"
 #include "bme68x_defs.h"
@@ -93,7 +91,6 @@ int main(void)
         {
             detected_device = true;
             NRF_LOG_INFO("TWI device detected at address 0x%x.", address);
-            //printf("detect\n\r"); printf("TWI device detected at address 0x%x.\n\r", address);
         }
         NRF_LOG_FLUSH();
     }
@@ -102,7 +99,6 @@ int main(void)
     {
         NRF_LOG_INFO("No device was found.");
         NRF_LOG_FLUSH();
-        printf("no detect\n\r");
     }
 
     NRF_LOG_FLUSH();
@@ -110,8 +106,8 @@ int main(void)
     nrf_delay_ms(3000);
 
 
-    lettura_sps30(2);
-    lettura_scd41(2);
+    //lettura_sps30(2);
+    //lettura_scd41(2);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //  ***********************
@@ -127,19 +123,17 @@ int main(void)
     uint32_t del_period;
     uint32_t time_ms;
     uint16_t sample_count = 1;
+    NRF_LOG_FLUSH();
     printf("INIZIO BME\n");
-    //bme.intf_ptr = TWI_INSTANCE_ID;       //non dovrebbe servire
     nrf_delay_ms(1000);
 
 
     rslt = bme68x_interface_init(&bme, BME68X_I2C_INTF); //controllare che le modifiche fatte vadano bene
     nrf_delay_ms(1000); //non necessario
-    bme68x_check_rslt("bme68x_interface_init", rslt);   //modificato, se tutto ok stampa tutto ok
-    NRF_LOG_FLUSH();
+    //bme68x_check_rslt("bme68x_interface_init", rslt);   //modificato, se tutto ok stampa tutto ok
+
     rslt = bme68x_init(&bme);
     bme68x_check_rslt("bme68x_init", rslt);
-    NRF_LOG_FLUSH();
-
     nrf_delay_ms(1000);
     
     conf.filter = BME68X_FILTER_OFF;
@@ -162,12 +156,10 @@ int main(void)
     {
         nrf_delay_ms(2000);
         rslt = bme68x_set_op_mode(BME68X_FORCED_MODE, &bme);
-        if(rslt < 0)   printf("Error set operational mode\n");
-        else printf("Starting forced mode\n");
+        bme68x_check_rslt("bme68x_set_op_mode", rslt);
 
         rslt = bme68x_get_data(BME68X_FORCED_MODE, &dati_bme, &n_fields, &bme);
-        if(rslt < 0)   printf("Error get data\n");
-        else printf("Getting data\n");
+        bme68x_check_rslt("bme68x_get_data", rslt);
 
         if(n_fields)
         {

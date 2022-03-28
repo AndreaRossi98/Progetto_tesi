@@ -13,7 +13,7 @@
 #include "common.h"
 #include "nrf_drv_twi.h"
 #include "nrf_delay.h"
-//#include "sensirion_i2c_hal.h"
+#include "sensirion_i2c_hal.h"
 
 /******************************************************************************/
 /*!                 Macro definitions                                         */
@@ -21,11 +21,10 @@
 #define BME68X_SHUTTLE_ID  0x93
 #define SDA_PIN 18
 #define SCL_PIN 19
-//#define DEV_ADDR 0x76
 /******************************************************************************/
 /*!                Static variable definition                                 */
-static uint8_t dev_addr = BME68X_I2C_ADDR_LOW;
-static const nrf_drv_twi_t i2c_instance = NRF_DRV_TWI_INSTANCE(1);
+static uint8_t dev_addr;
+static const nrf_drv_twi_t i2c_instance = NRF_DRV_TWI_INSTANCE(0);
 
 
 /******************************************************************************/
@@ -34,11 +33,18 @@ static const nrf_drv_twi_t i2c_instance = NRF_DRV_TWI_INSTANCE(1);
 /*!
  * I2C read function map to COINES platform
  */
+
+
+//se metto dev_addr dice device not found, poi però stampa valori a caso
+//se metto reg_addr dice communication failure
+
 BME68X_INTF_RET_TYPE bme68x_i2c_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *intf_ptr)
 {
-    uint8_t dev_addr = *(uint8_t*)intf_ptr;
+    //printf("1\n");
+    //uint8_t dev_addr = *(uint8_t*)intf_ptr;
     //int8_t err = sensirion_i2c_hal_read(dev_addr, reg_data, len); 
-    int8_t err = nrf_drv_twi_rx(&i2c_instance, reg_addr, reg_data, len);
+    int8_t err = nrf_drv_twi_rx(&i2c_instance, dev_addr, reg_data, len);
+    //printf("2\n");
     return err;
 }
 
@@ -47,9 +53,9 @@ BME68X_INTF_RET_TYPE bme68x_i2c_read(uint8_t reg_addr, uint8_t *reg_data, uint32
  */
 BME68X_INTF_RET_TYPE bme68x_i2c_write(uint8_t reg_addr, const uint8_t *reg_data, uint32_t len, void *intf_ptr)
 {
-    uint8_t dev_addr = *(uint8_t*)intf_ptr;
+    //uint8_t dev_addr = *(uint8_t*)intf_ptr;
     //int8_t err = sensirion_i2c_hal_write(dev_addr, reg_data, len);
-    int8_t err = nrf_drv_twi_tx(&i2c_instance, reg_addr, reg_data, len, false);
+    int8_t err = nrf_drv_twi_tx(&i2c_instance, dev_addr, reg_data, len, false);
     return err;
 }
 
@@ -62,12 +68,58 @@ void bme68x_delay_us(uint32_t period, void *intf_ptr)
     nrf_delay_us(period);
 }
 
+
+int8_t bme68x_interface_init(struct bme68x_dev *bme, uint8_t intf)
+{
+    int8_t rslt = BME68X_OK;
+    uint8_t reg_addr; 
+    const uint8_t *reg_data;
+    uint32_t len;
+    void *intf_ptr;
+
+    if (bme != NULL)
+    {
+        /* Bus configuration : I2C */
+        if (intf == BME68X_I2C_INTF)
+        {
+            printf("\nI2C Interface\n");
+            dev_addr = BME68X_I2C_ADDR_LOW;
+            bme->read = bme68x_i2c_read;
+            bme->write = bme68x_i2c_write;
+            bme->intf = BME68X_I2C_INTF;
+            //coines_config_i2c_bus(COINES_I2C_BUS_0, COINES_I2C_STANDARD_MODE);
+           /* const nrf_drv_twi_config_t i2c_instance_config = {  .scl = SCL_PIN,
+                                                                .sda = SDA_PIN,
+                                                                .frequency = NRF_TWI_FREQ_100K,
+                                                                .interrupt_priority = 0};
+            rslt = nrf_drv_twi_init(&i2c_instance, &i2c_instance_config, NULL, NULL);
+            //enable TWI instance
+            nrf_drv_twi_enable(&i2c_instance);
+    */
+        }
+        //coines_set_shuttleboard_vdd_vddio_config(3300, 3300);
+        //coines_delay_msec(100);
+        nrf_delay_ms(100);
+        //bme->chip_id = 0x61; //aggiunto per vedere se funziona
+        bme->delay_us = bme68x_delay_us;
+        bme->intf_ptr = &dev_addr;
+        bme->amb_temp = 25; /* The ambient temperature in deg C is used for defining the heater temperature */
+    }
+    else
+    {
+        rslt = BME68X_E_NULL_PTR;
+    }
+
+    return rslt;
+}
+
+
 void bme68x_check_rslt(const char api_name[], int8_t rslt)
 {
     switch (rslt)
     {
         case BME68X_OK:
-            printf("API name [%s]: Tutto ok\n\n", api_name);
+            printf("API name [%s]: Tutto ok\n", api_name);
             /* Do nothing */
             break;
         case BME68X_E_NULL_PTR:
@@ -94,56 +146,6 @@ void bme68x_check_rslt(const char api_name[], int8_t rslt)
     }
 }
 
-int8_t bme68x_interface_init(struct bme68x_dev *bme, uint8_t intf)
-{
-    int8_t rslt = BME68X_OK;
-    uint8_t reg_addr; 
-    const uint8_t *reg_data;
-    uint32_t len;
-    void *intf_ptr;
-
-    if (bme != NULL)
-    {
-        /* Bus configuration : I2C */
-        if (intf == BME68X_I2C_INTF)
-        {
-            printf("I2C Interface\n");
-            dev_addr = BME68X_I2C_ADDR_LOW;
-            bme->read = bme68x_i2c_read;
-            bme->write = bme68x_i2c_write;
-            bme->intf = BME68X_I2C_INTF;
-            //coines_config_i2c_bus(COINES_I2C_BUS_0, COINES_I2C_STANDARD_MODE);
-            const nrf_drv_twi_config_t i2c_instance_config = {.scl = SCL_PIN,
-                                                      .sda = SDA_PIN,
-                                                      .frequency = NRF_TWI_FREQ_100K,
-                                                      .interrupt_priority = 0};
-            rslt = nrf_drv_twi_init(&i2c_instance, &i2c_instance_config, NULL, NULL);
-            if (rslt) 
-            {
-                printf("Error %d: Initialization of I2C connection failed!\n", rslt);
-            }
-            //enable TWI instance
-            nrf_drv_twi_enable(&i2c_instance);
-
-           //void sensirion_i2c_hal_init(void);
-        }
-
-        nrf_delay_ms(100);
-
-        //coines_set_shuttleboard_vdd_vddio_config(3300, 3300);
-        //coines_delay_msec(100);
-
-        bme->delay_us = bme68x_delay_us;
-        bme->intf_ptr = &dev_addr;
-        bme->amb_temp = 25; /* The ambient temperature in deg C is used for defining the heater temperature */
-    }
-    else
-    {
-        rslt = BME68X_E_NULL_PTR;
-    }
-
-    return rslt;
-}
 /*
 void bme68x_coines_deinit(void)
 {

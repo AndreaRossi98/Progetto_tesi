@@ -555,7 +555,7 @@
 // <e> NRFX_UART_CONFIG_LOG_ENABLED - Enables logging in the module.
 //==========================================================
 #ifndef NRFX_UART_CONFIG_LOG_ENABLED
-#define NRFX_UART_CONFIG_LOG_ENABLED 0
+#define NRFX_UART_CONFIG_LOG_ENABLED 1
 #endif
 // <o> NRFX_UART_CONFIG_LOG_LEVEL  - Default Severity level
  
@@ -1957,8 +1957,63 @@
 #ifndef RTC_CONFIG_DEBUG_COLOR
 #define RTC_CONFIG_DEBUG_COLOR 0
 #endif
+//</e>
 
 // </e>
+
+// <e> NRFX_SAADC_ENABLED - nrfx_saadc - SAADC peripheral driver
+//==========================================================
+#ifndef NRFX_SAADC_ENABLED
+#define NRFX_SAADC_ENABLED 1
+#endif
+// <o> NRFX_SAADC_CONFIG_RESOLUTION  - Resolution
+ 
+// <0=> 8 bit 
+// <1=> 10 bit 
+// <2=> 12 bit 
+// <3=> 14 bit 
+
+#ifndef NRFX_SAADC_CONFIG_RESOLUTION
+#define NRFX_SAADC_CONFIG_RESOLUTION 1
+#endif
+
+// <o> NRFX_SAADC_CONFIG_OVERSAMPLE  - Sample period
+ 
+// <0=> Disabled 
+// <1=> 2x 
+// <2=> 4x 
+// <3=> 8x 
+// <4=> 16x 
+// <5=> 32x 
+// <6=> 64x 
+// <7=> 128x 
+// <8=> 256x 
+
+#ifndef NRFX_SAADC_CONFIG_OVERSAMPLE
+#define NRFX_SAADC_CONFIG_OVERSAMPLE 0
+#endif
+
+// <q> NRFX_SAADC_CONFIG_LP_MODE  - Enabling low power mode
+ 
+
+#ifndef NRFX_SAADC_CONFIG_LP_MODE
+#define NRFX_SAADC_CONFIG_LP_MODE 0
+#endif
+
+// <o> NRFX_SAADC_CONFIG_IRQ_PRIORITY  - Interrupt priority
+ 
+// <0=> 0 (highest) 
+// <1=> 1 
+// <2=> 2 
+// <3=> 3 
+// <4=> 4 
+// <5=> 5 
+// <6=> 6 
+// <7=> 7 
+
+#ifndef NRFX_SAADC_CONFIG_IRQ_PRIORITY
+#define NRFX_SAADC_CONFIG_IRQ_PRIORITY 6
+#endif
 
 // <e> SAADC_CONFIG_LOG_ENABLED - Enables logging in the module.
 //==========================================================
