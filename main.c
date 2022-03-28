@@ -191,6 +191,7 @@ int main(void)
             intero = dati_bme.gas_resistance;
             decimale = (dati_bme.gas_resistance - intero)*100;
             printf("Gas resistance: %d.%d O\n\n", intero, decimale);
+
         }
     }
 
