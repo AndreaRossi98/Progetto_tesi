@@ -130,12 +130,11 @@ int main(void)
 
     rslt = bme68x_interface_init(&bme, BME68X_I2C_INTF); //controllare che le modifiche fatte vadano bene
     nrf_delay_ms(1000); //non necessario
-    //bme68x_check_rslt("bme68x_interface_init", rslt);   //modificato, se tutto ok stampa tutto ok
+    bme68x_check_rslt("bme68x_interface_init", rslt);   //modificato, se tutto ok stampa tutto ok
 
     rslt = bme68x_init(&bme);
     bme68x_check_rslt("bme68x_init", rslt);
     nrf_delay_ms(1000);
-    
     conf.filter = BME68X_FILTER_OFF;
     conf.odr = BME68X_ODR_NONE;
     conf.os_hum = BME68X_OS_16X;

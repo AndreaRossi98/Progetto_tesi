@@ -43,9 +43,23 @@ BME68X_INTF_RET_TYPE bme68x_i2c_read(uint8_t reg_addr, uint8_t *reg_data, uint32
     //printf("1\n");
     //uint8_t dev_addr = *(uint8_t*)intf_ptr;
     //int8_t err = sensirion_i2c_hal_read(dev_addr, reg_data, len); 
-    int8_t err = nrf_drv_twi_rx(&i2c_instance, dev_addr, reg_data, len);
+    //int8_t err = nrf_drv_twi_rx(&i2c_instance, dev_addr, reg_data, len);
     //printf("2\n");
-    return err;
+    //return err;
+
+    for (int i=0; i<len; i++){ //Clears rx buffer
+        reg_data[i] = 0;
+    }
+
+    ret_code_t err_code = nrf_drv_twi_tx(&i2c_instance, BME68X_I2C_ADDR_LOW, &reg_addr, 1, false);
+
+    if (err_code == NRF_SUCCESS)
+    { //NRF_ERROR_INVALID_ADDR
+        ret_code_t err_code = nrf_drv_twi_rx(&i2c_instance, BME68X_I2C_ADDR_LOW, reg_data, len);
+        if (err_code == NRF_SUCCESS) return BME68X_OK;
+        else return 1;
+    }
+    else return 1;
 }
 
 /*!
@@ -55,8 +69,15 @@ BME68X_INTF_RET_TYPE bme68x_i2c_write(uint8_t reg_addr, const uint8_t *reg_data,
 {
     //uint8_t dev_addr = *(uint8_t*)intf_ptr;
     //int8_t err = sensirion_i2c_hal_write(dev_addr, reg_data, len);
-    int8_t err = nrf_drv_twi_tx(&i2c_instance, dev_addr, reg_data, len, false);
-    return err;
+    //int8_t err = nrf_drv_twi_tx(&i2c_instance, dev_addr, reg_data, len, false);
+    //return err;
+    uint8_t send_tmp[10] = {0};
+    send_tmp[0] = reg_addr;
+    memcpy(send_tmp+1, reg_data, len);
+    ret_code_t err_code = nrf_drv_twi_tx(&i2c_instance, BME68X_I2C_ADDR_LOW, send_tmp, len+1, false);
+    if (err_code == NRF_SUCCESS) return BME68X_OK;
+    else return 1;
+
 }
 
 

@@ -322,10 +322,13 @@ int8_t bme68x_set_conf(struct bme68x_conf *conf, struct bme68x_dev *dev)
     uint8_t data_array[BME68X_LEN_CONFIG] = { 0 };
 
     rslt = bme68x_get_op_mode(&current_op_mode, dev);
+
     if (rslt == BME68X_OK)
     {
         /* Configure only in the sleep mode */
+
         rslt = bme68x_set_op_mode(BME68X_SLEEP_MODE, dev);
+
     }
 
     if (conf == NULL)
@@ -440,7 +443,9 @@ int8_t bme68x_set_op_mode(const uint8_t op_mode, struct bme68x_dev *dev)
     /* Call until in sleep */
     do
     {
+
         rslt = bme68x_get_regs(BME68X_REG_CTRL_MEAS, &tmp_pow_mode, 1, dev);
+
         if (rslt == BME68X_OK)
         {
             /* Put to sleep before changing mode */
