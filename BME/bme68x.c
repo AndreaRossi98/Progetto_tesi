@@ -439,13 +439,10 @@ int8_t bme68x_set_op_mode(const uint8_t op_mode, struct bme68x_dev *dev)
     uint8_t tmp_pow_mode;
     uint8_t pow_mode = 0;
     uint8_t reg_addr = BME68X_REG_CTRL_MEAS;
-
     /* Call until in sleep */
     do
     {
-
         rslt = bme68x_get_regs(BME68X_REG_CTRL_MEAS, &tmp_pow_mode, 1, dev);
-
         if (rslt == BME68X_OK)
         {
             /* Put to sleep before changing mode */
@@ -563,7 +560,7 @@ int8_t bme68x_get_data(uint8_t op_mode, struct bme68x_data *data, uint8_t *n_dat
         {
             rslt = read_field_data(0, data, dev);
             if (rslt == BME68X_OK)
-            {
+            {;
                 if (data->status & BME68X_NEW_DATA_MSK)
                 {
                     new_fields = 1;
@@ -747,6 +744,7 @@ int8_t bme68x_selftest_check(const struct bme68x_dev *dev)
     t_dev.delay_us = dev->delay_us;
     t_dev.intf_ptr = dev->intf_ptr;
     rslt = bme68x_init(&t_dev);
+   
     if (rslt == BME68X_OK)
     {
         /* Set the temperature, pressure and humidity & filter settings */
@@ -758,13 +756,17 @@ int8_t bme68x_selftest_check(const struct bme68x_dev *dev)
         heatr_conf.enable = BME68X_ENABLE;
         heatr_conf.heatr_dur = BME68X_HEATR_DUR1;
         heatr_conf.heatr_temp = BME68X_HIGH_TEMP;
+ 
         rslt = bme68x_set_heatr_conf(BME68X_FORCED_MODE, &heatr_conf, &t_dev);
+        bme68x_check_rslt("bme68x_set_heatr_conf", rslt);
         if (rslt == BME68X_OK)
         {
             rslt = bme68x_set_conf(&conf, &t_dev);
+            bme68x_check_rslt("bme68x_set_conf", rslt);
             if (rslt == BME68X_OK)
             {
                 rslt = bme68x_set_op_mode(BME68X_FORCED_MODE, &t_dev); /* Trigger a measurement */
+                bme68x_check_rslt("bme68x_set_op_mode", rslt);
                 if (rslt == BME68X_OK)
                 {
                     /* Wait for the measurement to complete */

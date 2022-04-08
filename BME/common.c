@@ -7,13 +7,14 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "bme68x.h"
 #include "bme68x_defs.h"
 #include "common.h"
 #include "nrf_drv_twi.h"
 #include "nrf_delay.h"
-#include "sensirion_i2c_hal.h"
+
 
 /******************************************************************************/
 /*!                 Macro definitions                                         */
@@ -35,49 +36,88 @@ static const nrf_drv_twi_t i2c_instance = NRF_DRV_TWI_INSTANCE(0);
  */
 
 
-//se metto dev_addr dice device not found, poi però stampa valori a caso
+//se metto dev_addr dice device not found, poi perï¿½ stampa valori a caso
 //se metto reg_addr dice communication failure
 
 BME68X_INTF_RET_TYPE bme68x_i2c_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *intf_ptr)
 {
-    //printf("1\n");
-    //uint8_t dev_addr = *(uint8_t*)intf_ptr;
-    //int8_t err = sensirion_i2c_hal_read(dev_addr, reg_data, len); 
+    uint8_t dev_addr = *(uint8_t*)intf_ptr; 
     //int8_t err = nrf_drv_twi_rx(&i2c_instance, dev_addr, reg_data, len);
-    //printf("2\n");
     //return err;
 
+/*    versione 1: si blocca, non riesce a mettere a dormire il sensore
     for (int i=0; i<len; i++){ //Clears rx buffer
         reg_data[i] = 0;
     }
 
-    ret_code_t err_code = nrf_drv_twi_tx(&i2c_instance, BME68X_I2C_ADDR_LOW, &reg_addr, 1, false);
-
+    ret_code_t err_code = nrf_drv_twi_tx(&i2c_instance, dev_addr, &reg_addr, 1, false);
     if (err_code == NRF_SUCCESS)
     { //NRF_ERROR_INVALID_ADDR
-        ret_code_t err_code = nrf_drv_twi_rx(&i2c_instance, BME68X_I2C_ADDR_LOW, reg_data, len);
-        if (err_code == NRF_SUCCESS) return BME68X_OK;
-        else return 1;
+        ret_code_t err_code = nrf_drv_twi_rx(&i2c_instance, dev_addr, reg_data, len);       
+        if (err_code == NRF_SUCCESS) 
+            return BME68X_OK;
+        else 
+            return 1;
     }
     else return 1;
+*/
+   
+    ret_code_t ret_code;
+    ret_code = nrf_drv_twi_tx(&i2c_instance, dev_addr, &reg_addr,1,false);
+    if(ret_code != NRF_SUCCESS)
+    {
+        return ret_code;
+    }
+
+    ret_code = nrf_drv_twi_rx(&i2c_instance,dev_addr, reg_data, len);
+    if (ret_code == NRF_SUCCESS) 
+        return BME68X_OK;
+    else 
+        return 1;
+
+/*versione3
+    uint8_t error_code;
+    uint8_t whoAmIPointer = reg_addr;
+    error_code = nrf_drv_twi_tx(&i2c_instance, dev_addr, &whoAmIPointer, 1, true);
+    error_code = nrf_drv_twi_rx(&i2c_instance, dev_addr, &reg_data, 1);
+    return error_code;  
+    */ 
 }
+
 
 /*!
  * I2C write function map to COINES platform
  */
 BME68X_INTF_RET_TYPE bme68x_i2c_write(uint8_t reg_addr, const uint8_t *reg_data, uint32_t len, void *intf_ptr)
 {
-    //uint8_t dev_addr = *(uint8_t*)intf_ptr;
-    //int8_t err = sensirion_i2c_hal_write(dev_addr, reg_data, len);
+    uint8_t dev_addr = *(uint8_t*)intf_ptr;
     //int8_t err = nrf_drv_twi_tx(&i2c_instance, dev_addr, reg_data, len, false);
     //return err;
+
+/*  versione 1  
     uint8_t send_tmp[10] = {0};
     send_tmp[0] = reg_addr;
     memcpy(send_tmp+1, reg_data, len);
-    ret_code_t err_code = nrf_drv_twi_tx(&i2c_instance, BME68X_I2C_ADDR_LOW, send_tmp, len+1, false);
+    ret_code_t err_code = nrf_drv_twi_tx(&i2c_instance, dev_addr, send_tmp, len+1, false);
     if (err_code == NRF_SUCCESS) return BME68X_OK;
     else return 1;
+*/
 
+    ret_code_t ret_code;
+    ret_code = nrf_drv_twi_tx(&i2c_instance, dev_addr, reg_data, len , false); 
+    if (ret_code == NRF_SUCCESS) 
+        return BME68X_OK;
+    else 
+        return 1;
+
+    
+    /*versione 3
+    uint8_t valueBuffer[2];
+    valueBuffer[0] = reg_addr;
+    valueBuffer[1] = reg_data;
+    uint32_t err_code = nrf_drv_twi_tx(&i2c_instance, dev_addr, valueBuffer, sizeof(valueBuffer), false);
+    return err_code;
+    */
 }
 
 

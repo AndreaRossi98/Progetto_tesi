@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdint.h> //aggiunta dopo per vedere se cambia printf
 #include "boards.h"
 #include "nrf.h"
 #include "nordic_common.h"
@@ -12,7 +11,7 @@
 #include "nrf_log_default_backends.h"
 //#include "nrf_saadc.h"
 //#include "nrf_drv_saadc.h"
-       
+
 //BME68 libraries
 #include "bme68x.h"
 #include "bme68x_defs.h"
@@ -65,6 +64,8 @@ void twi_init (void)
     nrf_drv_twi_enable(&m_twi);
 }
 
+
+
 void log_init(void)
 {
     APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
@@ -106,7 +107,7 @@ int main(void)
     nrf_delay_ms(3000);
 
 
-    //lettura_sps30(2);
+    //lettura_sps30(10);
     //lettura_scd41(2);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -121,20 +122,18 @@ int main(void)
     struct bme68x_conf conf;
     struct bme68x_heatr_conf heatr_conf;
     uint32_t del_period;
-    uint32_t time_ms;
+    uint32_t time_ms = 0;
     uint16_t sample_count = 1;
     NRF_LOG_FLUSH();
     printf("INIZIO BME\n");
-    nrf_delay_ms(1000);
-
 
     rslt = bme68x_interface_init(&bme, BME68X_I2C_INTF); //controllare che le modifiche fatte vadano bene
-    nrf_delay_ms(1000); //non necessario
     bme68x_check_rslt("bme68x_interface_init", rslt);   //modificato, se tutto ok stampa tutto ok
 
     rslt = bme68x_init(&bme);
     bme68x_check_rslt("bme68x_init", rslt);
-    nrf_delay_ms(1000);
+
+
     conf.filter = BME68X_FILTER_OFF;
     conf.odr = BME68X_ODR_NONE;
     conf.os_hum = BME68X_OS_16X;
@@ -149,13 +148,20 @@ int main(void)
     rslt = bme68x_set_heatr_conf(BME68X_FORCED_MODE, &heatr_conf, &bme);
     bme68x_check_rslt("bme68x_set_heatr_conf", rslt);
 
-    //printf("Sample, TimeStamp(ms), Temperature(deg C), Pressure(Pa), Humidity(%%), Gas resistance(ohm), Status\n");
+    printf("Sample, TimeStamp(ms), Temperature(deg C), Pressure(Pa), Humidity(%%), Gas resistance(ohm), Status\n");
     
     while (sample_count <= SAMPLE_COUNT)
     {
-        nrf_delay_ms(2000);
+        nrf_delay_ms(1000);
+
         rslt = bme68x_set_op_mode(BME68X_FORCED_MODE, &bme);
         bme68x_check_rslt("bme68x_set_op_mode", rslt);
+
+        del_period = bme68x_get_meas_dur(BME68X_FORCED_MODE, &conf, &bme) + (heatr_conf.heatr_dur * 1000);
+        bme.delay_us(del_period, bme.intf_ptr);
+
+        //time_ms = coines_get_millis();
+        time_ms = time_ms + 1050;
 
         rslt = bme68x_get_data(BME68X_FORCED_MODE, &dati_bme, &n_fields, &bme);
         bme68x_check_rslt("bme68x_get_data", rslt);
@@ -190,6 +196,8 @@ int main(void)
             intero = dati_bme.gas_resistance;
             decimale = (dati_bme.gas_resistance - intero)*100;
             printf("Gas resistance: %d.%d O\n\n", intero, decimale);
+
+            sample_count++;
 
         }
     }

@@ -53,8 +53,7 @@ void lettura_sps30(uint8_t campioni)
 
     for(int i=0; i < campioni; i++)
     {
-        nrf_delay_ms(1000);
-        //sensirion_i2c_hal_sleep_usec(SPS30_MEASUREMENT_DURATION_USEC);
+        nrf_delay_ms(3000);
 
         ret = sps30_read_measurement(&measurement);
 
@@ -65,13 +64,13 @@ void lettura_sps30(uint8_t campioni)
         else
         {
             //stampa di tutti i valori letti(mass concentration and number concentration)
-            printf("Measurement n° %d:\n",i+1);            
+            printf("Measurement n° %d: ",i+1);            
             int16_t intero;
             int16_t decimale;
             //mc_1p0
             intero = measurement.mc_1p0;
             decimale = (measurement.mc_1p0 - intero)*100;
-            printf("PM 1.0: %d.%d [µg/m³]\n\r", intero, decimale);
+            //printf("PM 1.0: %d.%d [µg/m³]\n\r", intero, decimale);
             //mc_2p5
             intero = measurement.mc_2p5;
             decimale = (measurement.mc_2p5 - intero)*100;
@@ -79,38 +78,38 @@ void lettura_sps30(uint8_t campioni)
             //mc_4p0
             intero = measurement.mc_4p0;
             decimale = (measurement.mc_4p0 - intero)*100;
-            printf("PM 4.0: %d.%d [µg/m³]\n\r", intero, decimale);
+            //printf("PM 4.0: %d.%d [µg/m³]\n\r", intero, decimale);
             //mc_10p0
             intero = measurement.mc_10p0;
             decimale = (measurement.mc_10p0 - intero)*100;
-            printf("PM 10.0: %d.%d [µg/m³]\n\r", intero, decimale);
+            //printf("PM 10.0: %d.%d [µg/m³]\n\r", intero, decimale);
 
             //mc_0p5
             intero = measurement.nc_0p5;
             decimale = (measurement.nc_0p5 - intero)*100;
-            printf("PM 0.5: %d.%d [#/cm³]\n\r", intero, decimale);
+            //printf("PM 0.5: %d.%d [#/cm³]\n\r", intero, decimale);
             //mc_1p0
             intero = measurement.nc_1p0;
             decimale = (measurement.nc_1p0 - intero)*100;
-            printf("PM 1.0: %d.%d [#/cm³]\n\r", intero, decimale);
+            //printf("PM 1.0: %d.%d [#/cm³]\n\r", intero, decimale);
             //mc_2p5
             intero = measurement.nc_2p5;
             decimale = (measurement.nc_2p5 - intero)*100;
-            printf("PM 2.5: %d.%d [#/cm³]\n\r", intero, decimale);
+            //printf("PM 2.5: %d.%d [#/cm³]\n\r", intero, decimale);
             //mc_4p0
             intero = measurement.nc_4p0;
             decimale = (measurement.nc_4p0 - intero)*100;
-            printf("PM 4.0: %d.%d [#/cm³]\n\r", intero, decimale);
+            //printf("PM 4.0: %d.%d [#/cm³]\n\r", intero, decimale);
             //mc_10p0
             intero = measurement.nc_10p0;
             decimale = (measurement.nc_10p0 - intero)*100;
-            printf("PM 10.0: %d.%d [#/cm³]\n\r", intero, decimale);
+            //printf("PM 10.0: %d.%d [#/cm³]\n\r", intero, decimale);
 
             //typical particle size
             intero = measurement.typical_particle_size;
             decimale = (measurement.typical_particle_size - intero)*100;
-            printf("Typical particle size: %d.%d [nm]\n\r", intero, decimale);
-            printf("\n");
+            //printf("Typical particle size: %d.%d [nm]\n\r", intero, decimale);
+            //printf("\n");
         }
     }
 
